@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+<head>
+    <title>Chat Application</title>
+</head>
+<body>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzUyMDUyMDU3fQ.dxpveMGAKAa9yQz3x4NEfrAggpcOp9eBi9hdTODaIDc";
+        const roomId = "room1";
+        const ws = new WebSocket(`ws://localhost:8000/ws/${roomId}?token=${token}`);
+        
+        ws.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<p><strong>${message.username}:</strong> ${message.content}</p>`;
+        };
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = {
+                content: input.value
+            };
+            ws.send(JSON.stringify(message));
+            input.value = '';
+        }
+        
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
